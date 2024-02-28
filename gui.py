@@ -13,12 +13,12 @@ class Land:
         self.status_play = 0 # 0 - not start, 1 - playing, 2 - win, 3 - lose
         self.time_play = 0
         self.openned = rows * cols - mine_qty
-        self.mines_area = [[[0, 0] for _ in range(cols)] for _ in range(rows)]
+        self.mines_area = None
         self.mines_loc = []
         self.drop_mine()
-        pygame.time.set_timer(pygame.USEREVENT, 1000)
 
     def drop_mine(self):
+        self.mines_area = [[[0, 0] for _ in range(self.cols)] for _ in range(self.rows)]
         total = self.rows * self.cols
         self.mines_loc = []
 
@@ -31,10 +31,6 @@ class Land:
                 for xd, yd in diag:
                     if 0 <= x + xd < self.cols and 0 <= y + yd < self.rows and self.mines_area[y + yd][x + xd][0] != "*":
                         self.mines_area[y + yd][x + xd][0] += 1
-
-    def redrop_mine(self):
-        self.mines_area = [[[0, 0] for _ in range(self.cols)] for _ in range(self.rows)]
-        self.drop_mine()
     
     def draw(self):
         # TEXT
@@ -109,7 +105,8 @@ class Land:
                     if mine[0] == "*":
                         if self.status_play == 0:
                             while mine[0] == "*":
-                                self.redrop_mine()
+                                self.drop_mine()
+                                mine = self.mines_area[y][x]
                             self.click(pos, btn)
                         else:
                             for loc in self.mines_loc:
